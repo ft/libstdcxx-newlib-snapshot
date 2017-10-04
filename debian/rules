@@ -107,3 +107,7 @@ override_dh_install:
 
 override_dh_strip:
 	dh_strip -X.a
+
+.PHONY: generate-orig-tarball
+generate-orig-tarball:
+	@printf 'Nothing to be done for generate-orig-tarball'
