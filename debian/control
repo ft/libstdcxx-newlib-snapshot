@@ -1,0 +1,55 @@
+Source: libstdc++-arm-none-eabi-newlib-snapshot
+Section: devel
+Priority: extra
+Maintainer: Frank Terbeck <ft@bewatermyfriend.org>
+Build-Depends:
+ autotools-dev,
+ gdb-binutils-arm-none-eabi-snapshot,
+ gcc-arm-none-eabi-snapshot,
+ gcc-arm-none-eabi-snapshot-source,
+ libnewlib-snapshot-arm-none-eabi,
+ bison,
+ debhelper (>= 9),
+ dejagnu,
+ flex,
+ gawk,
+ gettext,
+ libgmp-dev,
+ libmpc-dev,
+ libmpfr-dev,
+ libtool,
+ locales,
+ lsb-release,
+ lzma,
+ m4,
+ patchutils,
+ sharutils,
+ texinfo,
+ xz-utils,
+ zlib1g-dev,
+ libisl-dev,
+ libcloog-isl-dev,
+ rename,
+Standards-Version: 4.0.0
+Homepage: http://gcc.gnu.org/
+Vcs-Git: git://anonscm.debian.org/collab-maint/libstdc++-arm-none-eabi.git
+Vcs-Browser: http://anonscm.debian.org/gitweb/?p=collab-maint/libstdc++-arm-none-eabi.git
+
+Package: libstdc++-arm-none-eabi-newlib-snapshot
+Architecture: all
+Built-Using: ${Built-Using}
+Depends:
+ ${misc:Depends},
+ ${shlibs:Depends},
+ libnewlib-snapshot-dev,
+ libnewlib-snapshot-arm-none-eabi,
+Recommends:
+ gdb-binutils-arm-none-eabi-snapshot,
+ gcc-arm-none-eabi-snapshot,
+Conflicts: libstdc++-arm-none-eabi-newlib
+Replaces: libstdc++-arm-none-eabi-newlib
+Description: GNU Standard C++ Library v3 for ARM Cortex-A/R/M processors (newlib)
+ GNU Standard C++ library for embedded ARM chips using Cortex-M0/M0+/M3/M4,
+ Cortex-R4/R5/R7 and Cortex-A* processors.
+ .
+ This library is built using newlib as standard C library.

@@ -1,0 +1,5 @@
+libstdc++-arm-none-eabi-newlib-snapshot (1) unstable; urgency=medium
+
+  * Inital package version, based in Debian's libstdc++-arm-none-eabi package
+
+ -- Frank Terbeck <ft@bewatermyfriend.org>  Tue, 03 Oct 2017 16:59:54 +0200

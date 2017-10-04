@@ -1,0 +1,19 @@
+This is a debian package of a snapshot of GNU GCC's libstdc++ compiled for
+embedded ARM chips using the armv6-m, armv7-m armv7e-m or armv7-r architec-
+tures. The package is based on Debian's libstdc++-arm-none-eabi package and it
+submits to the same copyright terms.
+
+-------------------------------------------------------------------------
+
+This is a debian package of GNU libstdc++ compiled for embedded ARM chips using
+the armv6-m, armv7-m armv7e-m or armv7-r architectures.
+
+This copyright file covers only the packaging of the compiler and not
+the compiler itself. The copyright for GCC can be found in copyright-gcc
+
+Copyright: GNU General Public License
+
+Copyright © 2014 Agustin Henze <tin@debian.rg>
+
+On Debian GNU/Linux systems, the complete text of the GNU General
+Public License can be found in `/usr/share/common-licenses/GPL'.

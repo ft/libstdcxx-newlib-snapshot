@@ -1,0 +1,109 @@
+#!/usr/bin/make -f
+# export DH_VERBOSE=1
+
+TARGET=arm-none-eabi
+
+MULTILIB_LIST="--with-multilib-list=rmprofile"
+
+GCC_PACKAGE=gcc-arm-none-eabi-snapshot
+
+SVERSION := $(shell dpkg-query -W -f="\$${Version}\n" $(GCC_PACKAGE)-source)
+DVERSION := $(SVERSION)+$(shell dpkg-parsechangelog | sed -ne "s/^Version: \(.*\)/\1/p")
+UVERSION := $(shell echo $(DVERSION) | cut -d- -f1)
+BASE_VERSION := $(shell echo $(DVERSION) | sed -e 's/\([1-9]\.[0-9]\).*-.*/\1/')
+BUILT_USING := $(shell dpkg-query -f '$${source:Package} (= $${source:Version}), ' -W $(GCC_PACKAGE)-source)
+
+TOP_DIR=$(shell pwd)
+LIBSTDCXX_SDIR=$(TOP_DIR)/src/libstdc++-v3
+STAMP_DIR=$(TOP_DIR)/debian/stamp
+UNPACK=$(STAMP_DIR)/unpack
+APPY_PATCHES=$(STAMP_DIR)/patches
+BUILD_DIR=$(TOP_DIR)/build/libstdc++
+BUILD_NANO_DIR=$(TOP_DIR)/build_nano/libstdc++
+PNEWLIB=libstdc\+\+-arm-none-eabi-newlib-snapshot
+
+BUILDFLAGS=CFLAGS="-g -O2 -ffunction-sections -fdata-sections" CXXFLAGS="-g -O2 -ffunction-sections -fdata-sections" LDFLAGS=""
+BUILDFLAGS_NANO=CFLAGS="-g -Os -ffunction-sections -fdata-sections -fno-exceptions -fshort-wchar" CXXFLAGS="-g -Os -ffunction-sections -fdata-sections -fno-exceptions -fshort-wchar" LDFLAGS=""
+
+TARGET_TOOLS=\
+	AR_FOR_TARGET=$(TARGET)-ar \
+	AS_FOR_TARGET=$(TARGET)-as \
+	LD_FOR_TARGET=$(TARGET)-ld \
+	NM_FOR_TARGET=$(TARGET)-nm \
+	OBJDUMP_FOR_TARGET=$(TARGET)-objdump \
+	RANLIB_FOR_TARGET=$(TARGET)-ranlib \
+	READELF_FOR_TARGET=$(TARGET)-readelf \
+	STRIP_FOR_TARGET=$(TARGET)-strip
+
+CONFIGURE_FLAGS = \
+	--with-cross-host=$(DEB_HOST_GNU_TYPE) \
+	--enable-multilib \
+	--disable-decimal-float \
+	--disable-libffi \
+	--disable-libgomp \
+	--disable-libmudflap \
+	--disable-libquadmath \
+	--disable-libssp \
+	--disable-libstdcxx-pch \
+	--disable-nls \
+	--disable-shared \
+	--disable-threads \
+	--disable-tls \
+	--disable-plugin \
+	--disable-libstdcxx-verbose \
+	--mandir=/usr/share/man \
+	--with-system-zlib \
+	--with-gnu-as \
+	--with-gnu-ld \
+	--with-newlib \
+	--with-headers=yes \
+	"--with-pkgversion=$(DVERSION)" \
+	--without-included-gettext \
+	--with-host-libstdcxx="-static-libgcc -Wl,-Bstatic,-lstdc++,-Bdynamic -lm" \
+	--enable-languages=c,c++ \
+	--disable-option-checking \
+	--build=$(DEB_BUILD_GNU_TYPE) \
+	--target=$(TARGET) \
+	--host=$(TARGET) \
+	$(MULTILIB_LIST) \
+	$(TARGET_TOOLS)
+
+%:
+	dh $@ --with autotools-dev --parallel
+
+$(UNPACK):
+	mkdir -p $(STAMP_DIR)
+	tar xf /usr/src/gcc-arm-none-eabi-snapshot-source.tar.*
+	touch $@
+
+override_dh_auto_configure: $(UNPACK)
+	mkdir -p $(BUILD_DIR) $(BUILD_NANO_DIR)
+	dh_auto_configure -D$(LIBSTDCXX_SDIR) -B$(BUILD_DIR) -- $(CONFIGURE_FLAGS) $(BUILDFLAGS)
+	dh_auto_configure -D$(LIBSTDCXX_SDIR) -B$(BUILD_NANO_DIR) -- $(CONFIGURE_FLAGS) $(BUILDFLAGS_NANO)
+
+override_dh_auto_clean:
+	rm -rf src build* debian/*tmp* $(STAMP_DIR)
+
+override_dh_auto_test:
+	@echo "no testing, that's way too painful"
+
+override_dh_gencontrol:
+	dh_gencontrol -- -v$(DVERSION) -Vlocal:Version=$(UVERSION) -Vgcc:Version=$(SVERSION) -VBuilt-Using="$(BUILT_USING)"
+
+override_dh_auto_build:
+	dh_auto_build -B $(BUILD_DIR)
+	dh_auto_build -B $(BUILD_NANO_DIR)
+
+override_dh_auto_install:
+	dh_auto_install -B $(BUILD_DIR) --destdir debian/$(PNEWLIB)-tmp
+	dh_auto_install -B $(BUILD_NANO_DIR) --destdir debian/$(PNEWLIB)-tmp_nano
+	find debian/$(PNEWLIB)-tmp_nano \
+		-name "*.a" \
+		-exec rename 's@debian/$(PNEWLIB)-tmp_nano/(.*).a@debian/$(PNEWLIB)-tmp/$$1_nano.a@' \{\} \;
+	find debian/$(PNEWLIB)-tmp -name "*.la" -exec rm -f {} +
+
+override_dh_install:
+	dh_install --sourcedir debian/$(PNEWLIB)-tmp
+
+override_dh_strip:
+	dh_strip -X.a
