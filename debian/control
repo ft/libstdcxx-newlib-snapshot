@@ -1,6 +1,6 @@
 Source: libstdc++-arm-none-eabi-newlib-snapshot
 Section: devel
-Priority: extra
+Priority: optional
 Maintainer: Frank Terbeck <ft@bewatermyfriend.org>
 Build-Depends:
  autotools-dev,
@@ -27,13 +27,13 @@ Build-Depends:
  texinfo,
  xz-utils,
  zlib1g-dev,
- libisl-dev,
+ libisl-0.18-dev,
  libcloog-isl-dev,
  rename,
-Standards-Version: 4.0.0
+Standards-Version: 4.2.0
 Homepage: http://gcc.gnu.org/
-Vcs-Git: git://anonscm.debian.org/collab-maint/libstdc++-arm-none-eabi.git
-Vcs-Browser: http://anonscm.debian.org/gitweb/?p=collab-maint/libstdc++-arm-none-eabi.git
+Vcs-Git: https://github.com/ft/libstdcxx-newlib-snapshot.git
+Vcs-Browser: https://github.com/ft/libstdcxx-newlib-snapshot
 
 Package: libstdc++-arm-none-eabi-newlib-snapshot
 Architecture: all
